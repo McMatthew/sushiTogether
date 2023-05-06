@@ -48,7 +48,7 @@ const JoinSessionCard = () => {
             input: { width: "100%" },
           }}
         />
-        <Button onClick={() => {}}>partecipa</Button>
+        <Button onClick={() => {}}>Partecipa</Button>
       </Group>
     </Card>
   );
