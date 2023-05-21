@@ -1,14 +1,4 @@
-import {
-  Box,
-  Card,
-  Group,
-  TextInput,
-  Title,
-  NumberInput,
-  Chip,
-  Button,
-  Image,
-} from "@mantine/core";
+import { Card, Group, TextInput, Title, Button, Image } from "@mantine/core";
 import Pattern from "../assets/topography.svg";
 import chip from "../assets/chip.png";
 import logo from "../assets/logo.png";
@@ -48,6 +38,7 @@ const JoinSessionCard = () => {
             input: { width: "100%" },
           }}
         />
+
         <Button onClick={() => {}}>Partecipa</Button>
       </Group>
     </Card>
