@@ -1,11 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { OrderItem } from "../common";
-import { useFirebaseApp } from "reactfire";
-import { DatabaseReference, getDatabase, ref } from "firebase/database";
 
 type OrderContextPropstype = {
-  code?: string;
-  setCode: (c: string) => void;
+  firebasetoken: string | null;
+  setFirebaseToken: (a: string | null) => void;
   addPlate: (p: string, q: number) => void;
   removePlate: (p: string) => void;
   editPlate: (p: string, q: number) => void;
@@ -13,8 +11,8 @@ type OrderContextPropstype = {
 };
 
 const DefaultOrderContextProps = {
-  code: undefined,
-  setCode: () => {},
+  firebasetoken: "",
+  setFirebaseToken: () => {},
   addPlate: () => {},
   removePlate: () => {},
   editPlate: () => {},
@@ -27,17 +25,7 @@ export const OrderContextProvider: React.FC<{ children: JSX.Element }> = ({
   children,
 }) => {
   const [plates, setPlates] = useState([] as OrderItem[]);
-  const [code, setCode] = useState<string>();
-  const [dbref, setDbref] = useState<DatabaseReference>();
-  const app = useFirebaseApp();
-
-  useEffect(() => {
-    if (code) setDbref(ref(getDatabase(app), code));
-  }, [code]);
-
-  function _setCode(a: string) {
-    setCode(a);
-  }
+  const [fbToken, setFbToken] = useState<string | null>(null);
 
   function addPlate(plate: string, quantity: number) {
     if (quantity === 0 || !Number.isInteger(quantity)) return;
@@ -71,11 +59,15 @@ export const OrderContextProvider: React.FC<{ children: JSX.Element }> = ({
     setPlates(editedOrder);
   }
 
+  function _setFbToken(a: string | null) {
+    setFbToken(a);
+  }
+
   return (
     <OrderContext.Provider
       value={{
-        code,
-        setCode: _setCode,
+        firebasetoken: fbToken,
+        setFirebaseToken: _setFbToken,
         addPlate,
         removePlate,
         editPlate,

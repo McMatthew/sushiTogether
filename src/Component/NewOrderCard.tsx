@@ -14,19 +14,26 @@ import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, push } from "firebase/database";
 import { useFirebaseApp } from "reactfire";
 import { useState } from "react";
+import { useOrder } from "../context/orderContext";
 
 const NewOrderCard = () => {
   const navigate = useNavigate();
   const sessionCode = makeCode(5);
   const app = useFirebaseApp();
+  const { setFirebaseToken } = useOrder();
   const [title, setTitle] = useState<string>();
   const [nickname, setNickname] = useState<string>();
 
   async function initSession() {
     if (!title || !nickname) return;
-    var sessionInstance = { title: title, partecipants: ["admin"], orders: [] };
+    var sessionInstance = {
+      title: title,
+      partecipants: [nickname],
+      orders: [],
+    };
     const databaseRef = ref(getDatabase(app), sessionCode);
     const snapshot = await push(databaseRef, sessionInstance);
+    setFirebaseToken(snapshot.key);
     navigate(`/session/${sessionCode}`);
     return snapshot;
   }

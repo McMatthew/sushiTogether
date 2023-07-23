@@ -10,19 +10,68 @@ import {
   Title,
 } from "@mantine/core";
 import { IconReceipt } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOrder } from "../context/orderContext";
+import { redirect } from "react-router-dom";
 import ConfirmModal from "./ConfirmModal";
 import { useDisclosure } from "@mantine/hooks";
+import { useDatabase } from "reactfire";
+import { ref, onValue, set } from "firebase/database";
+import { ReturnedSessionType } from "../common";
 
 const CreateOrderMenu = () => {
   const [item, setItem] = useState<string>();
   const [quantity, setQuantity] = useState<number>();
-  const { addPlate, setCode } = useOrder();
+  const { addPlate, firebasetoken, plates } = useOrder();
   const [opened, { open, close }] = useDisclosure();
+  const database = useDatabase();
   const pathnameSplitted = location.pathname.split("/");
   const sessionCode = pathnameSplitted[pathnameSplitted.length - 1];
-  setCode(sessionCode);
+  const [data, setData] = useState<ReturnedSessionType | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const dataRef = ref(database, sessionCode);
+      onValue(dataRef, (snapshot) => {
+        const fetchedData = snapshot.val();
+        setData(fetchedData);
+      });
+    };
+
+    fetchData();
+  }, []);
+
+  async function prepareOrder() {
+    if (data && firebasetoken) {
+      const dataRef = ref(database, `${sessionCode}/${firebasetoken}/orders`);
+      const mergedMap = new Map();
+
+      for (const obj1 of data[firebasetoken].orders ?? []) {
+        const { item, quantity } = obj1;
+        if (mergedMap.has(item)) {
+          mergedMap.set(item, mergedMap.get(item) + quantity);
+        } else {
+          mergedMap.set(item, quantity);
+        }
+      }
+
+      for (const obj2 of plates) {
+        const { item, quantity } = obj2;
+        if (mergedMap.has(item)) {
+          mergedMap.set(item, mergedMap.get(item) + quantity);
+        } else {
+          mergedMap.set(item, quantity);
+        }
+      }
+
+      const mergedArray = Array.from(mergedMap, ([item, quantity]) => ({
+        item,
+        quantity,
+      }));
+
+      await set(dataRef, mergedArray);
+    }
+  }
 
   return (
     <>
@@ -30,7 +79,11 @@ const CreateOrderMenu = () => {
         title={"Sicuro sicuro?"}
         onClose={close}
         opened={opened}
-        onConfirm={() => {}}
+        onConfirm={() => {
+          prepareOrder();
+          close();
+          redirect("/lobby");
+        }}
       />
       <Card shadow="md" radius={"md"} mt={16}>
         <Card.Section>
