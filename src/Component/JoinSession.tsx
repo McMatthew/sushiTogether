@@ -2,8 +2,19 @@ import { Card, Group, TextInput, Title, Button, Image } from "@mantine/core";
 import Pattern from "../assets/topography.svg";
 import chip from "../assets/chip.png";
 import logo from "../assets/logo.png";
+import {useFirebaseApp} from "reactfire";
+import {getDatabase, ref} from "firebase/database";
+import {useState} from "react";
 
 const JoinSessionCard = () => {
+  const app = useFirebaseApp();
+  const [code, setCode] = useState('')
+
+
+  function logIntoSession(code: string){
+    const databaseRef = ref(getDatabase(app), code)
+    console.log((databaseRef.key))
+  }
   return (
     <Card
       shadow="md"
@@ -33,13 +44,15 @@ const JoinSessionCard = () => {
         <Title order={4}>codice:</Title>
         <TextInput
           maxLength={5}
+          value={code}
+          onChange={(e)=>setCode(e.currentTarget.value)}
           styles={{
             root: { flexGrow: 1, flexBasis: "30%", position: "relative" },
             input: { width: "100%" },
           }}
         />
 
-        <Button onClick={() => {}}>Partecipa</Button>
+        <Button onClick={() => logIntoSession(code)}>Partecipa</Button>
       </Group>
     </Card>
   );

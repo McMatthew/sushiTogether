@@ -13,30 +13,34 @@ import { makeCode } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, push } from "firebase/database";
 import { useFirebaseApp } from "reactfire";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useOrder } from "../context/orderContext";
 
 const NewOrderCard = () => {
   const navigate = useNavigate();
-  const sessionCode = makeCode(5);
   const app = useFirebaseApp();
   const { setFirebaseToken } = useOrder();
   const [title, setTitle] = useState<string>();
   const [nickname, setNickname] = useState<string>();
+  const [sessionCode, setSessionCode] = useState<string>();
 
   async function initSession() {
     if (!title || !nickname) return;
-    var sessionInstance = {
-      title: title,
-      partecipants: [nickname],
-      orders: [],
-    };
-    const databaseRef = ref(getDatabase(app), sessionCode);
+      const sessionInstance = {
+          title: title,
+          partecipants: [nickname],
+          orders: [],
+      };
+      const databaseRef = ref(getDatabase(app), sessionCode);
     const snapshot = await push(databaseRef, sessionInstance);
     setFirebaseToken(snapshot.key);
     navigate(`/session/${sessionCode}`);
     return snapshot;
   }
+
+  useEffect(()=>{
+      setSessionCode(makeCode(5))
+  }, [])
 
   return (
     <Card shadow="md" radius={"md"}>
@@ -54,11 +58,11 @@ const NewOrderCard = () => {
             placeholder="Titolo"
             py={8}
             onChange={(val) => setTitle(val.currentTarget.value)}
-            styles={(theme) => ({
+            styles={() => ({
               input: {
                 fontSize: 35,
                 paddingLeft: 8,
-                color: theme.colors.green[3],
+                color: "white",
                 height: "unset",
                 fontWeight: 600,
               },
