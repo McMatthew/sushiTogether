@@ -3,14 +3,15 @@ export type OrderItem = {
   quantity: number;
 };
 
-export type OrderSummaryPropsType = {
-  items: OrderItem[] | [];
-};
+export interface Session {
+  limit: number;
+  title: string;
+  partecipants: string[];
+  orders?: {
+    [key: string]: OrderItem[];
+  };
+}
 
 export type ReturnedSessionType = {
-  [key: string]: {
-    title: string;
-    partecipants: string[];
-    orders?: OrderItem[] | [];
-  };
+  [key: string]: Session;
 };

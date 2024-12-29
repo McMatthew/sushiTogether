@@ -4,10 +4,8 @@ import { ReactNode } from "react";
 const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <MantineProvider
-      withGlobalStyles
-      withNormalizeCSS
+      defaultColorScheme={"dark"}
       theme={{
-        colorScheme: "dark",
         primaryColor: "lime",
         colors: {
           gold: [

@@ -4,11 +4,11 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 import {
-  DatabaseProvider,
   AuthProvider,
-  useFirebaseApp,
-  StorageProvider,
+  DatabaseProvider,
   FirestoreProvider,
+  StorageProvider,
+  useFirebaseApp,
 } from "reactfire";
 
 const FirebaseDbProvider: React.FC<{ children: JSX.Element }> = ({
